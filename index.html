@@ -7,9 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
+            @page { margin: 1cm; }
             #controles { display: none !important; }
-            body { background-color: white; }
-            .hoja { box-shadow: none; padding: 0; }
+            body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 0 !important; }
+            .hoja { box-shadow: none !important; padding: 0 !important; max-width: 100% !important; width: 100% !important; margin: 0 !important;}
         }
     </style>
 </head>
@@ -126,10 +127,16 @@
         </div>
 
         <h3 class="font-bold mb-2">III. CLÁUSULAS LEGALES DE RESGUARDO Y OPERACIÓN</h3>
-        <p class="text-xs mb-2 text-justify">El presente acuerdo establece los términos bajo los cuales el CLIENTE se constituye como el único responsable legal de la maquinaria propiedad de VOLTEK S.A. DE C.V.</p>
-        <p class="text-xs mb-2 text-justify"><strong>SÉPTIMA. Cancelación Anticipada:</strong> En caso de que el CLIENTE decida cancelar el presente contrato, se obliga irrevocablemente a cubrir una penalización mínima equivalente al <strong>65% del valor neto total</strong>, correspondiente a la cantidad de <strong class="text-red-600" id="out-penalizacion">$17,400.50 MXN</strong>.</p>
+        <p class="text-[11px] mb-2 text-justify">El presente acuerdo establece los términos bajo los cuales el CLIENTE se constituye como el único responsable legal de la maquinaria propiedad de VOLTEK S.A. DE C.V.</p>
+        <p class="text-[11px] mb-1 text-justify"><strong>PRIMERA.</strong> El CLIENTE recibe en carácter de depósito, arrendamiento y resguardo temporal de uso exclusivo la maquinaria marca CFG Industrial Tipo H12. Queda estrictamente prohibido subarrendar, prestar o trasladar fuera de la zona de trabajo.</p>
+        <p class="text-[11px] mb-1 text-justify"><strong>SEGUNDA.</strong> El CLIENTE se compromete a mantener la maquinaria bajo resguardo seguro, en un área perimetral protegida y bajo techo.</p>
+        <p class="text-[11px] mb-1 text-justify"><strong>TERCERA.</strong> El CLIENTE garantiza que la máquina será operada por personal calificado. Cualquier falla derivada de mala operación será su responsabilidad.</p>
+        <p class="text-[11px] mb-1 text-justify"><strong>CUARTA. Responsabilidad Civil Total:</strong> En caso de daño parcial, total o robo, el CLIENTE cubrirá el 100% del valor comercial de reposición.</p>
+        <p class="text-[11px] mb-1 text-justify"><strong>QUINTA. Devolución y Penalizaciones:</strong> Al concluir el periodo, la maquinaria deberá regresar en óptimas condiciones. El retraso generará penalización diaria de $3,800.00 MXN.</p>
+        <p class="text-[11px] mb-1 text-justify"><strong>SEXTA. Jurisdicción:</strong> Las partes se someten a la jurisdicción de los tribunales de Almoloya de Juárez y Toluca, Estado de México.</p>
+        <p class="text-[11px] mb-2 text-justify"><strong>SÉPTIMA. Cancelación Anticipada:</strong> En caso de que el CLIENTE decida cancelar el presente contrato, se obliga irrevocablemente a cubrir una penalización mínima equivalente al <strong>65% del valor neto total</strong>, correspondiente a la cantidad de <strong class="text-red-600" id="out-penalizacion">$17,400.50 MXN</strong>.</p>
         
-        <div class="bg-gray-100 p-3 mt-4 mb-16 text-sm border border-gray-300">
+        <div class="bg-gray-100 p-3 mt-4 mb-8 text-sm border border-gray-300">
             <strong>ACUERDO DE PAGO DIARIO:</strong> El cliente reconoce y acepta el pago total neto de <strong id="out-neto-txt">$26,770.00 MXN</strong>, el cual será cubierto indefectiblemente mediante <strong>PAGOS DIARIOS de <span id="out-pagodiario">$3,824.29 MXN</span></strong> durante los <span id="out-dias-txt">7</span> días de duración del presente acuerdo.
         </div>
 
