@@ -39,6 +39,10 @@
                 <input type="text" id="in-modelo" class="w-full border p-2 rounded" value="CFG Industrial H12" oninput="updateDoc()">
             </div>
             <div>
+                <label class="block text-xs font-bold text-gray-600 uppercase">Fecha de Inicio</label>
+                <input type="date" id="in-fecha-inicio" class="w-full border p-2 rounded" oninput="updateDoc()">
+            </div>
+            <div>
                 <label class="block text-xs font-bold text-gray-600 uppercase">Tarifa Diaria ($)</label>
                 <input type="number" id="in-tarifa" class="w-full border p-2 rounded" value="3800" oninput="updateDoc()">
             </div>
@@ -79,6 +83,7 @@
             <div class="text-right text-xs">
                 <p><strong>Referencia:</strong> VTK-2026-099</p>
                 <p><strong>Fecha Emisión:</strong> <span id="out-fecha">25 de mayo de 2026</span></p>
+                <p><strong>Fecha de Inicio:</strong> <span id="out-fecha-inicio-hdr" class="font-bold text-blue-800">---</span></p>
                 <p><strong>Vigencia:</strong> 15 días naturales</p>
             </div>
         </div>
@@ -134,10 +139,12 @@
         <p class="text-[11px] mb-1 text-justify"><strong>CUARTA. Responsabilidad Civil Total:</strong> En caso de daño parcial, total o robo, el CLIENTE cubrirá el 100% del valor comercial de reposición.</p>
         <p class="text-[11px] mb-1 text-justify"><strong>QUINTA. Devolución y Penalizaciones:</strong> Al concluir el periodo, la maquinaria deberá regresar en óptimas condiciones. El retraso generará penalización diaria de $3,800.00 MXN.</p>
         <p class="text-[11px] mb-1 text-justify"><strong>SEXTA. Jurisdicción:</strong> Las partes se someten a la jurisdicción de los tribunales de Almoloya de Juárez y Toluca, Estado de México.</p>
-        <p class="text-[11px] mb-2 text-justify"><strong>SÉPTIMA. Cancelación Anticipada:</strong> En caso de que el CLIENTE decida cancelar el presente contrato, se obliga irrevocablemente a cubrir una penalización mínima equivalente al <strong>65% del valor neto total</strong>, correspondiente a la cantidad de <strong class="text-red-600" id="out-penalizacion">$17,400.50 MXN</strong>.</p>
-        
+        <p class="text-[11px] mb-1 text-justify"><strong>SÉPTIMA. Cancelación Anticipada:</strong> En caso de que el CLIENTE decida cancelar el presente contrato, se obliga irrevocablemente a cubrir una penalización mínima equivalente al <strong>65% del valor neto total</strong>, correspondiente a la cantidad de <strong class="text-red-600" id="out-penalizacion">$17,400.50 MXN</strong>.</p>
+        <p class="text-[11px] mb-1 text-justify"><strong>OCTAVA. Entrega y Vigencia:</strong> El periodo de arrendamiento por <span id="out-dias-clausula" class="font-bold">7</span> días inicia formalmente a partir del <strong id="out-fecha-inicio-txt">---</strong>, fecha en la cual la maquinaria es entregada y puesta a disposición del CLIENTE.</p>
+        <p class="text-[11px] mb-2 text-justify"><strong>NOVENA. Combustible y Consumibles:</strong> El arrendamiento incluye una dotación diaria de 13 litros de gasolina para la operación de la maquinaria. Cualquier excedente de combustible o consumible adicional requerido será cubierto exclusivamente por el CLIENTE.</p>
+
         <div class="bg-gray-100 p-3 mt-4 mb-8 text-sm border border-gray-300">
-            <strong>ACUERDO DE PAGO DIARIO:</strong> El cliente reconoce y acepta el pago total neto de <strong id="out-neto-txt">$26,770.00 MXN</strong>, el cual será cubierto indefectiblemente mediante <strong>PAGOS DIARIOS de <span id="out-pagodiario">$3,824.29 MXN</span></strong> durante los <span id="out-dias-txt">7</span> días de duración del presente acuerdo.
+            <strong>ACUERDO DE PAGO DIARIO:</strong> El cliente reconoce y acepta el pago total neto de <strong id="out-neto-txt">$26,770.00 MXN</strong>, el cual será cubierto indefectiblemente mediante <strong>PAGOS DIARIOS de <span id="out-pagodiario">$3,824.29 MXN</span></strong> durante los <span id="out-dias-txt-2">7</span> días de duración del presente acuerdo.
         </div>
 
         <div class="grid grid-cols-2 gap-8 text-center mt-12">
@@ -161,6 +168,7 @@
             const cliente = document.getElementById('in-cliente').value;
             const curp = document.getElementById('in-curp').value;
             const modelo = document.getElementById('in-modelo').value;
+            const fechaInicioVal = document.getElementById('in-fecha-inicio').value;
             const tarifa = parseFloat(document.getElementById('in-tarifa').value) || 0;
             const dias = parseInt(document.getElementById('in-dias').value) || 0;
             const pDesc = parseFloat(document.getElementById('in-desc').value) || 0;
@@ -172,13 +180,24 @@
             const penalizacion = neto * 0.65;
             const pagoDiario = dias > 0 ? neto / dias : 0;
 
+            // Formatear la fecha de inicio
+            let fechaInicioTexto = "---";
+            if (fechaInicioVal) {
+                const [year, month, day] = fechaInicioVal.split('-');
+                const fechaObj = new Date(year, month - 1, day);
+                fechaInicioTexto = fechaObj.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+
             document.getElementById('out-cliente').innerText = cliente;
             document.getElementById('out-cliente-firma').innerText = cliente;
             document.getElementById('out-curp').innerText = curp;
             document.getElementById('out-modelo').innerText = modelo;
+            document.getElementById('out-fecha-inicio-hdr').innerText = fechaInicioTexto;
+            document.getElementById('out-fecha-inicio-txt').innerText = fechaInicioTexto;
             document.getElementById('out-tarifa').innerText = formatMoney(tarifa);
             document.getElementById('out-dias').innerText = dias;
-            document.getElementById('out-dias-txt').innerText = dias;
+            document.getElementById('out-dias-clausula').innerText = dias;
+            document.getElementById('out-dias-txt-2').innerText = dias;
             document.getElementById('out-subtotal-tabla').innerText = formatMoney(subtotal);
             document.getElementById('out-subtotal').innerText = formatMoney(subtotal);
             document.getElementById('out-porcentaje').innerText = pDesc;
@@ -193,7 +212,12 @@
         // Init fecha actual y cálculos iniciales
         const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('out-fecha').innerText = new Date().toLocaleDateString('es-MX', opciones);
-        updateDoc(); // Ejecutar una vez al cargar para asegurar que el flete inicial se refleje
+        
+        // Cargar fecha de hoy como default en el input
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('in-fecha-inicio').value = todayStr;
+        
+        updateDoc(); 
     </script>
 </body>
 </html>
