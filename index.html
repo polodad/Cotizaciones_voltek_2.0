@@ -3,235 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Cotizaciones VOLTEK</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Firmar Documento ✍️</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <style>
-        @media print {
-            @page { margin: 1cm; }
-            #controles { display: none !important; }
-            body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 0 !important; }
-            .hoja { box-shadow: none !important; padding: 0 !important; max-width: 100% !important; width: 100% !important; margin: 0 !important;}
-        }
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: auto; text-align: center; }
+        /* La pizarra para firmar */
+        canvas { border: 2px dashed #000; background: #f4f4f4; width: 100%; height: 200px; touch-action: none; cursor: crosshair; }
+        button { margin-top: 15px; padding: 12px; width: 100%; background: #28a745; color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 5px; }
+        .btn-limpiar { background: #dc3545; }
+        input { margin: 15px 0; }
     </style>
 </head>
-<body class="bg-gray-200 p-4 md:p-8 font-sans">
+<body>
 
-    <!-- Controles (Tipo Excel) -->
-    <div id="controles" class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg mb-8 border-t-4 border-blue-600">
-        <h2 class="text-xl font-bold mb-4 flex items-center text-blue-800">
-            <span>⚙️ Variables de la Cotización (Calculadora Automática)</span>
-            <button onclick="window.print()" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold shadow transition">
-                🖨️ Imprimir / Guardar PDF
-            </button>
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-gray-600 uppercase">Nombre del Cliente</label>
-                <input type="text" id="in-cliente" class="w-full border p-2 rounded" value="DIEGO RICARDO AUDIRAC MARIN" oninput="updateDoc()">
-            </div>
-            <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-gray-600 uppercase">CURP</label>
-                <input type="text" id="in-curp" class="w-full border p-2 rounded" value="AUMD670205HDFDRG02" oninput="updateDoc()">
-            </div>
-            <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-gray-600 uppercase">Modelo Maquinaria</label>
-                <input type="text" id="in-modelo" class="w-full border p-2 rounded" value="CFG Industrial H12" oninput="updateDoc()">
-            </div>
-            <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-gray-600 uppercase">Ubicación / Coordenadas</label>
-                <input type="text" id="in-ubicacion" class="w-full border p-2 rounded" value="Naucalpan de Juárez, Méx. (19.420069, -99.247078)" oninput="updateDoc()">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase">Fecha de Inicio</label>
-                <input type="date" id="in-fecha-inicio" class="w-full border p-2 rounded" oninput="updateDoc()">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase">Tarifa Diaria ($)</label>
-                <input type="number" id="in-tarifa" class="w-full border p-2 rounded" value="3800" oninput="updateDoc()">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase">Días</label>
-                <input type="number" id="in-dias" class="w-full border p-2 rounded" value="7" oninput="updateDoc()">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase">Flete ($)</label>
-                <input type="number" id="in-flete" class="w-full border p-2 rounded" value="1500" oninput="updateDoc()">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase">% Descuento</label>
-                <input type="number" id="in-desc" class="w-full border p-2 rounded" value="5" oninput="updateDoc()">
-            </div>
-        </div>
-    </div>
+    <h2>Firma el documento aquí 👇</h2>
+    
+    <label>1. Sube el PDF (El que ya tiene tu firma):</label>
+    <input type="file" id="pdfInput" accept="application/pdf">
 
-    <!-- Documento a Imprimir -->
-    <div class="hoja max-w-4xl mx-auto bg-white p-12 shadow-2xl text-sm text-gray-800 rounded">
-        
-        <!-- Header con Logo SVG Recreado -->
-        <div class="flex flex-col items-center text-center mb-8 border-b-2 border-gray-300 pb-6">
-            <svg viewBox="0 0 100 100" width="80" height="80" class="mb-2">
-                <polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill="none" stroke="#334155" stroke-width="5" stroke-linejoin="round"/>
-                <path d="M 30,30 L 50,70 L 60,45" fill="none" stroke="#1e3a8a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-                <polygon points="65,15 45,55 58,55 45,85 70,45 55,45" fill="#eab308" />
-            </svg>
-            <h1 class="text-3xl font-extrabold tracking-widest text-blue-900">VOLTEK</h1>
-            <p class="font-bold">SISTEMAS DE ENERGÍA Y EQUIPO INDUSTRIAL</p>
-            <p class="text-xs text-gray-600">Responsable: Emiliano Leopoldo Reyes Monroy | Cargo: Jefe de Operaciones<br>Contacto: operaciones@voltek.com.mx</p>
-        </div>
+    <label>2. Dibuja tu firma:</label>
+    <canvas id="pizarra"></canvas>
+    <button class="btn-limpiar" onclick="limpiar()">Limpiar Firma 🧹</button>
 
-        <div class="flex justify-between mb-8">
-            <div>
-                <h2 class="text-xl font-bold">COTIZACIÓN Y CONTRATO</h2>
-            </div>
-            <div class="text-right text-xs">
-                <p><strong>Referencia:</strong> VTK-2026-099</p>
-                <p><strong>Fecha Emisión:</strong> <span id="out-fecha">25 de mayo de 2026</span></p>
-                <p><strong>Fecha de Inicio:</strong> <span id="out-fecha-inicio-hdr" class="font-bold text-blue-800">---</span></p>
-                <p><strong>Vigencia:</strong> 15 días naturales</p>
-            </div>
-        </div>
-
-        <div class="mb-6 border-l-4 border-blue-900 pl-4 bg-gray-50 p-2">
-            <p><strong>PREPARADO PARA (DEPOSITARIO):</strong></p>
-            <p class="font-bold text-lg" id="out-cliente">DIEGO RICARDO AUDIRAC MARIN</p>
-            <p><strong>CURP:</strong> <span id="out-curp">AUMD670205HDFDRG02</span></p>
-        </div>
-
-        <div class="mb-4 text-sm bg-blue-50 p-2 border border-blue-200">
-            <strong>📍 SITIO DE OPERACIÓN AUTORIZADO:</strong> <span id="out-ubicacion">Naucalpan de Juárez, Méx. (19.420069, -99.247078)</span>
-        </div>
-
-        <h3 class="font-bold mb-2">II. DESGLOSE DE COSTOS E INFORMACIÓN DE PAGO</h3>
-        <table class="w-full border-collapse border border-gray-400 mb-4 text-center">
-            <tr class="bg-gray-200">
-                <th class="border border-gray-400 p-2 text-left">CONCEPTO / DESCRIPCIÓN</th>
-                <th class="border border-gray-400 p-2">TARIFA DIARIA</th>
-                <th class="border border-gray-400 p-2">DÍAS</th>
-                <th class="border border-gray-400 p-2">SUBTOTAL</th>
-            </tr>
-            <tr>
-                <td class="border border-gray-400 p-2 text-left">Arrendamiento Maquinaria <span id="out-modelo">CFG Industrial H12</span></td>
-                <td class="border border-gray-400 p-2" id="out-tarifa">$3,800.00 MXN</td>
-                <td class="border border-gray-400 p-2" id="out-dias">7</td>
-                <td class="border border-gray-400 p-2" id="out-subtotal-tabla">$26,600.00 MXN</td>
-            </tr>
-        </table>
-
-        <div class="flex justify-end mb-8">
-            <table class="w-72">
-                <tr>
-                    <td class="font-bold text-right pr-4">Subtotal Bruto:</td>
-                    <td class="text-right" id="out-subtotal">$26,600.00 MXN</td>
-                </tr>
-                <tr>
-                    <td class="font-bold text-right pr-4 text-red-600">Descuento (<span id="out-porcentaje">5</span>%):</td>
-                    <td class="text-right text-red-600" id="out-desc">-$1,330.00 MXN</td>
-                </tr>
-                <tr>
-                    <td class="font-bold text-right pr-4 text-blue-700">Costo de Flete:</td>
-                    <td class="text-right text-blue-700" id="out-flete">$1,500.00 MXN</td>
-                </tr>
-                <tr class="text-lg border-t-2 border-gray-800">
-                    <td class="font-bold text-right pr-4 pt-2">Total Neto a Pagar:</td>
-                    <td class="text-right font-bold pt-2" id="out-neto">$26,770.00 MXN</td>
-                </tr>
-            </table>
-        </div>
-
-        <h3 class="font-bold mb-2">III. CLÁUSULAS LEGALES DE RESGUARDO Y OPERACIÓN</h3>
-        <p class="text-[11px] mb-2 text-justify">El presente acuerdo establece los términos bajo los cuales el CLIENTE se constituye como el único responsable legal de la maquinaria propiedad de VOLTEK S.A. DE C.V.</p>
-        <p class="text-[11px] mb-1 text-justify"><strong>PRIMERA.</strong> El CLIENTE recibe en carácter de depósito, arrendamiento y resguardo temporal de uso exclusivo la maquinaria marca CFG Industrial Tipo H12. Queda estrictamente prohibido subarrendar, prestar o trasladar fuera de la zona de trabajo.</p>
-        <p class="text-[11px] mb-1 text-justify"><strong>SEGUNDA.</strong> El CLIENTE se compromete a mantener la maquinaria bajo resguardo seguro, en un área perimetral protegida y bajo techo.</p>
-        <p class="text-[11px] mb-1 text-justify"><strong>TERCERA.</strong> El CLIENTE garantiza que la máquina será operada por personal calificado. Cualquier falla derivada de mala operación será su responsabilidad.</p>
-        <p class="text-[11px] mb-1 text-justify"><strong>CUARTA. Responsabilidad Civil Total:</strong> En caso de daño parcial, total o robo, el CLIENTE cubrirá el 100% del valor comercial de reposición.</p>
-        <p class="text-[11px] mb-1 text-justify"><strong>QUINTA. Devolución y Penalizaciones:</strong> Al concluir el periodo, la maquinaria deberá regresar en óptimas condiciones. El retraso generará penalización diaria de $3,800.00 MXN.</p>
-        <p class="text-[11px] mb-1 text-justify"><strong>SEXTA. Jurisdicción:</strong> Las partes se someten a la jurisdicción de los tribunales de Almoloya de Juárez y Toluca, Estado de México.</p>
-        <p class="text-[11px] mb-1 text-justify"><strong>SÉPTIMA. Cancelación Anticipada:</strong> En caso de que el CLIENTE decida cancelar el presente contrato, se obliga irrevocablemente a cubrir una penalización mínima equivalente al <strong>65% del valor neto total</strong>, correspondiente a la cantidad de <strong class="text-red-600" id="out-penalizacion">$17,400.50 MXN</strong>.</p>
-        <p class="text-[11px] mb-1 text-justify"><strong>OCTAVA. Entrega y Vigencia:</strong> El periodo de arrendamiento por <span id="out-dias-clausula" class="font-bold">7</span> días inicia formalmente a partir del <strong id="out-fecha-inicio-txt">---</strong>, fecha en la cual la maquinaria es entregada y puesta a disposición del CLIENTE.</p>
-        <p class="text-[11px] mb-2 text-justify"><strong>NOVENA. Combustible y Consumibles:</strong> El arrendamiento incluye una dotación diaria de 13 litros de gasolina para la operación de la maquinaria. Cualquier excedente de combustible o consumible adicional requerido será cubierto exclusivamente por el CLIENTE.</p>
-
-        <div class="bg-gray-100 p-3 mt-4 mb-8 text-sm border border-gray-300">
-            <strong>ACUERDO DE PAGO DIARIO:</strong> El cliente reconoce y acepta el pago total neto de <strong id="out-neto-txt">$26,770.00 MXN</strong>, el cual será cubierto indefectiblemente mediante <strong>PAGOS DIARIOS de <span id="out-pagodiario">$3,824.29 MXN</span></strong> durante los <span id="out-dias-txt-2">7</span> días de duración del presente acuerdo.
-        </div>
-
-        <div class="grid grid-cols-2 gap-8 text-center mt-12">
-            <div>
-                <hr class="border-gray-500 mb-2 w-4/5 mx-auto">
-                <p class="font-bold">Emiliano Leopoldo Reyes Monroy</p>
-                <p class="text-xs">Jefe de Operaciones<br>VOLTEK S.A. DE C.V.</p>
-            </div>
-            <div>
-                <hr class="border-gray-500 mb-2 w-4/5 mx-auto">
-                <p class="font-bold uppercase" id="out-cliente-firma">DIEGO RICARDO AUDIRAC MARIN</p>
-                <p class="text-xs">Cliente y Depositario Legal</p>
-            </div>
-        </div>
-    </div>
+    <button onclick="firmar()">Guardar PDF Firmado 📥</button>
 
     <script>
-        const formatMoney = (num) => '$' + num.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' MXN';
+        const canvas = document.getElementById('pizarra');
+        const ctx = canvas.getContext('2d');
+        let dibujando = false;
 
-        function updateDoc() {
-            const cliente = document.getElementById('in-cliente').value;
-            const curp = document.getElementById('in-curp').value;
-            const modelo = document.getElementById('in-modelo').value;
-            const ubicacion = document.getElementById('in-ubicacion').value;
-            const fechaInicioVal = document.getElementById('in-fecha-inicio').value;
-            const tarifa = parseFloat(document.getElementById('in-tarifa').value) || 0;
-            const dias = parseInt(document.getElementById('in-dias').value) || 0;
-            const pDesc = parseFloat(document.getElementById('in-desc').value) || 0;
-            const flete = parseFloat(document.getElementById('in-flete').value) || 0;
+        // Ajustar tamaño real del canvas
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
 
-            const subtotal = tarifa * dias;
-            const desc = subtotal * (pDesc / 100);
-            const neto = subtotal - desc + flete;
-            const penalizacion = neto * 0.65;
-            const pagoDiario = dias > 0 ? neto / dias : 0;
-
-            // Formatear la fecha de inicio
-            let fechaInicioTexto = "---";
-            if (fechaInicioVal) {
-                const [year, month, day] = fechaInicioVal.split('-');
-                const fechaObj = new Date(year, month - 1, day);
-                fechaInicioTexto = fechaObj.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
-            }
-
-            // Cambiar el título del documento para que al imprimir/guardar tome el nombre del cliente
-            document.title = "Cotizacion_VOLTEK_" + cliente.trim().replace(/\s+/g, "_");
-
-            document.getElementById('out-cliente').innerText = cliente;
-            document.getElementById('out-cliente-firma').innerText = cliente;
-            document.getElementById('out-curp').innerText = curp;
-            document.getElementById('out-modelo').innerText = modelo;
-            document.getElementById('out-ubicacion').innerText = ubicacion;
-            document.getElementById('out-fecha-inicio-hdr').innerText = fechaInicioTexto;
-            document.getElementById('out-fecha-inicio-txt').innerText = fechaInicioTexto;
-            document.getElementById('out-tarifa').innerText = formatMoney(tarifa);
-            document.getElementById('out-dias').innerText = dias;
-            document.getElementById('out-dias-clausula').innerText = dias;
-            document.getElementById('out-dias-txt-2').innerText = dias;
-            document.getElementById('out-subtotal-tabla').innerText = formatMoney(subtotal);
-            document.getElementById('out-subtotal').innerText = formatMoney(subtotal);
-            document.getElementById('out-porcentaje').innerText = pDesc;
-            document.getElementById('out-desc').innerText = '-' + formatMoney(desc);
-            document.getElementById('out-flete').innerText = formatMoney(flete);
-            document.getElementById('out-neto').innerText = formatMoney(neto);
-            document.getElementById('out-neto-txt').innerText = formatMoney(neto);
-            document.getElementById('out-penalizacion').innerText = formatMoney(penalizacion);
-            document.getElementById('out-pagodiario').innerText = formatMoney(pagoDiario);
+        // Funciones para dibujar (Mouse y Táctil) 🎨
+        const empezar = (e) => { dibujando = true; dibujar(e); }
+        const terminar = () => { dibujando = false; ctx.beginPath(); }
+        const dibujar = (e) => {
+            if (!dibujando) return;
+            e.preventDefault(); // Evita que la pantalla haga scroll en celulares
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#000';
+            
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
         }
-        
-        // Init fecha actual y cálculos iniciales
-        const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('out-fecha').innerText = new Date().toLocaleDateString('es-MX', opciones);
-        
-        // Cargar fecha de hoy como default en el input
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('in-fecha-inicio').value = todayStr;
-        
-        updateDoc(); 
+
+        // Escuchar eventos
+        canvas.addEventListener('mousedown', empezar); canvas.addEventListener('mouseup', terminar); canvas.addEventListener('mousemove', dibujar);
+        canvas.addEventListener('touchstart', empezar); canvas.addEventListener('touchend', terminar); canvas.addEventListener('touchmove', dibujar);
+
+        function limpiar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        async function firmar() {
+            const file = document.getElementById('pdfInput').files[0];
+            if (!file) return alert("Falta subir el PDF ⚠️");
+
+            // Convertir el dibujo a una imagen PNG en base64
+            const imgDataUrl = canvas.toDataURL('image/png');
+
+            // Leer PDF y cargar librería
+            const pdfBytes = await file.arrayBuffer();
+            const { PDFDocument } = PDFLib;
+            const pdfDoc = await PDFDocument.load(pdfBytes);
+            
+            // Cargar la imagen de la firma dibujada
+            const imgBytes = await fetch(imgDataUrl).then(res => res.arrayBuffer());
+            const firmaImg = await pdfDoc.embedPng(imgBytes);
+
+            // Pegar la firma en la primera página
+            const pagina = pdfDoc.getPages()[0];
+            pagina.drawImage(firmaImg, {
+                x: 50,  // Posición a la izquierda 📏
+                y: 100, // Posición desde abajo 📏
+                width: 150, 
+                height: 75
+            });
+
+            // Descargar el PDF final
+            const pdfModificado = await pdfDoc.save();
+            const blob = new Blob([pdfModificado], { type: "application/pdf" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "documento_final.pdf";
+            link.click();
+        }
     </script>
 </body>
-</html>
 </html>
