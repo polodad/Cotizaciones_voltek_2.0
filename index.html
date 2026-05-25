@@ -38,6 +38,10 @@
                 <label class="block text-xs font-bold text-gray-600 uppercase">Modelo Maquinaria</label>
                 <input type="text" id="in-modelo" class="w-full border p-2 rounded" value="CFG Industrial H12" oninput="updateDoc()">
             </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-gray-600 uppercase">Ubicación / Coordenadas</label>
+                <input type="text" id="in-ubicacion" class="w-full border p-2 rounded" value="Naucalpan de Juárez, Méx. (19.420069, -99.247078)" oninput="updateDoc()">
+            </div>
             <div>
                 <label class="block text-xs font-bold text-gray-600 uppercase">Fecha de Inicio</label>
                 <input type="date" id="in-fecha-inicio" class="w-full border p-2 rounded" oninput="updateDoc()">
@@ -92,6 +96,10 @@
             <p><strong>PREPARADO PARA (DEPOSITARIO):</strong></p>
             <p class="font-bold text-lg" id="out-cliente">DIEGO RICARDO AUDIRAC MARIN</p>
             <p><strong>CURP:</strong> <span id="out-curp">AUMD670205HDFDRG02</span></p>
+        </div>
+
+        <div class="mb-4 text-sm bg-blue-50 p-2 border border-blue-200">
+            <strong>📍 SITIO DE OPERACIÓN AUTORIZADO:</strong> <span id="out-ubicacion">Naucalpan de Juárez, Méx. (19.420069, -99.247078)</span>
         </div>
 
         <h3 class="font-bold mb-2">II. DESGLOSE DE COSTOS E INFORMACIÓN DE PAGO</h3>
@@ -168,6 +176,7 @@
             const cliente = document.getElementById('in-cliente').value;
             const curp = document.getElementById('in-curp').value;
             const modelo = document.getElementById('in-modelo').value;
+            const ubicacion = document.getElementById('in-ubicacion').value;
             const fechaInicioVal = document.getElementById('in-fecha-inicio').value;
             const tarifa = parseFloat(document.getElementById('in-tarifa').value) || 0;
             const dias = parseInt(document.getElementById('in-dias').value) || 0;
@@ -188,10 +197,14 @@
                 fechaInicioTexto = fechaObj.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
             }
 
+            // Cambiar el título del documento para que al imprimir/guardar tome el nombre del cliente
+            document.title = "Cotizacion_VOLTEK_" + cliente.trim().replace(/\s+/g, "_");
+
             document.getElementById('out-cliente').innerText = cliente;
             document.getElementById('out-cliente-firma').innerText = cliente;
             document.getElementById('out-curp').innerText = curp;
             document.getElementById('out-modelo').innerText = modelo;
+            document.getElementById('out-ubicacion').innerText = ubicacion;
             document.getElementById('out-fecha-inicio-hdr').innerText = fechaInicioTexto;
             document.getElementById('out-fecha-inicio-txt').innerText = fechaInicioTexto;
             document.getElementById('out-tarifa').innerText = formatMoney(tarifa);
@@ -220,4 +233,5 @@
         updateDoc(); 
     </script>
 </body>
+</html>
 </html>
