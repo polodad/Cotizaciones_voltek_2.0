@@ -63,6 +63,13 @@
                 <input type="number" id="in-desc" class="w-full border p-2 rounded" value="5" oninput="updateDoc()">
             </div>
         </div>
+
+        <div class="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded-lg">
+            <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" id="in-martillo" class="w-5 h-5 accent-yellow-500" onchange="updateDoc()">
+                <span class="text-sm font-bold text-yellow-800">🔨 Incluir Martillo Hidráulico (+25% sobre tarifa diaria = <span id="lbl-martillo-costo">$950.00 MXN</span>/día)</span>
+            </label>
+        </div>
     </div>
 
     <!-- Documento a Imprimir -->
@@ -116,6 +123,12 @@
                 <td class="border border-gray-400 p-2" id="out-dias">7</td>
                 <td class="border border-gray-400 p-2" id="out-subtotal-tabla">$26,600.00 MXN</td>
             </tr>
+            <tr id="fila-martillo" style="display: none;">
+                <td class="border border-gray-400 p-2 text-left">🔨 Adicional Martillo Hidráulico (25% s/tarifa diaria)</td>
+                <td class="border border-gray-400 p-2" id="out-tarifa-martillo">$950.00 MXN</td>
+                <td class="border border-gray-400 p-2" id="out-dias-martillo">7</td>
+                <td class="border border-gray-400 p-2" id="out-subtotal-martillo">$6,650.00 MXN</td>
+            </tr>
         </table>
 
         <div class="flex justify-end mb-8">
@@ -123,6 +136,10 @@
                 <tr>
                     <td class="font-bold text-right pr-4">Subtotal Bruto:</td>
                     <td class="text-right" id="out-subtotal">$26,600.00 MXN</td>
+                </tr>
+                <tr id="fila-martillo-resumen" style="display: none;">
+                    <td class="font-bold text-right pr-4 text-yellow-700">Adicional Martillo Hidráulico:</td>
+                    <td class="text-right text-yellow-700" id="out-subtotal-martillo-resumen">$6,650.00 MXN</td>
                 </tr>
                 <tr>
                     <td class="font-bold text-right pr-4 text-red-600">Descuento (<span id="out-porcentaje">5</span>%):</td>
@@ -152,7 +169,14 @@
         <p class="text-[11px] mb-2 text-justify"><strong>NOVENA. Combustible y Consumibles:</strong> El arrendamiento incluye una dotación diaria de 13 litros de gasolina para la operación de la maquinaria. Cualquier excedente de combustible o consumible adicional requerido será cubierto exclusivamente por el CLIENTE.</p>
 
         <div class="bg-gray-100 p-3 mt-4 mb-8 text-sm border border-gray-300">
-            <strong>ACUERDO DE PAGO DIARIO:</strong> El cliente reconoce y acepta el pago total neto de <strong id="out-neto-txt">$26,770.00 MXN</strong>, el cual será cubierto indefectiblemente mediante <strong>PAGOS DIARIOS de <span id="out-pagodiario">$3,824.29 MXN</span></strong> durante los <span id="out-dias-txt-2">7</span> días de duración del presente acuerdo.
+            <strong>ACUERDO DE PAGO SEMANAL (VIERNES):</strong> El cliente reconoce y acepta el pago total neto de <strong id="out-neto-txt">$26,770.00 MXN</strong>, el cual será cubierto indefectiblemente mediante pagos realizados <strong>cada VIERNES</strong> durante el periodo de arrendamiento de <span id="out-dias-txt-2">7</span> días, conforme al siguiente calendario:
+            <table class="w-full border-collapse border border-gray-400 mt-3 text-center text-xs" id="tabla-pagos-viernes">
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-400 p-2">No. PAGO</th>
+                    <th class="border border-gray-400 p-2">FECHA (VIERNES)</th>
+                    <th class="border border-gray-400 p-2">MONTO A PAGAR</th>
+                </tr>
+            </table>
         </div>
 
         <div class="grid grid-cols-2 gap-8 text-center mt-12">
@@ -182,12 +206,50 @@
             const dias = parseInt(document.getElementById('in-dias').value) || 0;
             const pDesc = parseFloat(document.getElementById('in-desc').value) || 0;
             const flete = parseFloat(document.getElementById('in-flete').value) || 0;
+            const incluyeMartillo = document.getElementById('in-martillo').checked;
 
             const subtotal = tarifa * dias;
-            const desc = subtotal * (pDesc / 100);
-            const neto = subtotal - desc + flete;
+            
+            // Martillo hidráulico: 25% adicional sobre la tarifa diaria
+            const tarifaMartillo = tarifa * 0.25;
+            const subtotalMartillo = incluyeMartillo ? tarifaMartillo * dias : 0;
+            
+            const subtotalGeneral = subtotal + subtotalMartillo;
+            const desc = subtotalGeneral * (pDesc / 100);
+            const neto = subtotalGeneral - desc + flete;
             const penalizacion = neto * 0.65;
-            const pagoDiario = dias > 0 ? neto / dias : 0;
+
+            // Calcular viernes de pago dentro del periodo de arrendamiento
+            let viernesPago = [];
+            if (fechaInicioVal && dias > 0) {
+                const [y, m, d] = fechaInicioVal.split('-').map(Number);
+                const inicio = new Date(y, m - 1, d);
+                const fin = new Date(inicio);
+                fin.setDate(fin.getDate() + dias - 1); // último día del periodo
+                
+                // Encontrar el primer viernes desde la fecha de inicio
+                let current = new Date(inicio);
+                const dayOfWeek = current.getDay(); // 0=dom, 5=vie
+                const daysUntilFriday = (5 - dayOfWeek + 7) % 7;
+                if (daysUntilFriday === 0 && dayOfWeek === 5) {
+                    // Ya es viernes, incluirlo
+                } else {
+                    current.setDate(current.getDate() + daysUntilFriday);
+                }
+                
+                // Recopilar todos los viernes dentro del periodo
+                while (current <= fin) {
+                    viernesPago.push(new Date(current));
+                    current.setDate(current.getDate() + 7);
+                }
+                
+                // Si no hay ningún viernes en el periodo, pago al último día
+                if (viernesPago.length === 0) {
+                    viernesPago.push(new Date(fin));
+                }
+            }
+            
+            const montoPorViernes = viernesPago.length > 0 ? neto / viernesPago.length : 0;
 
             // Formatear la fecha de inicio
             let fechaInicioTexto = "---";
@@ -219,7 +281,51 @@
             document.getElementById('out-neto').innerText = formatMoney(neto);
             document.getElementById('out-neto-txt').innerText = formatMoney(neto);
             document.getElementById('out-penalizacion').innerText = formatMoney(penalizacion);
-            document.getElementById('out-pagodiario').innerText = formatMoney(pagoDiario);
+
+            // Generar tabla de pagos de viernes
+            const tablaPagos = document.getElementById('tabla-pagos-viernes');
+            // Limpiar filas anteriores (mantener header)
+            while (tablaPagos.rows.length > 1) {
+                tablaPagos.deleteRow(1);
+            }
+            const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            viernesPago.forEach((viernes, i) => {
+                const row = tablaPagos.insertRow();
+                const cellNum = row.insertCell();
+                const cellFecha = row.insertCell();
+                const cellMonto = row.insertCell();
+                cellNum.className = 'border border-gray-400 p-2 font-bold';
+                cellFecha.className = 'border border-gray-400 p-2';
+                cellMonto.className = 'border border-gray-400 p-2 font-bold';
+                cellNum.innerText = (i + 1);
+                cellFecha.innerText = viernes.toLocaleDateString('es-MX', opcionesFecha);
+                cellMonto.innerText = formatMoney(montoPorViernes);
+            });
+            // Fila de total
+            if (viernesPago.length > 0) {
+                const rowTotal = tablaPagos.insertRow();
+                const cellTotalLabel = rowTotal.insertCell();
+                const cellTotalEmpty = rowTotal.insertCell();
+                const cellTotalMonto = rowTotal.insertCell();
+                cellTotalLabel.colSpan = 1;
+                cellTotalLabel.className = 'border border-gray-400 p-2 font-bold bg-gray-200';
+                cellTotalEmpty.className = 'border border-gray-400 p-2 font-bold bg-gray-200';
+                cellTotalMonto.className = 'border border-gray-400 p-2 font-bold bg-gray-200 text-lg';
+                cellTotalLabel.innerText = '';
+                cellTotalEmpty.innerText = 'TOTAL';
+                cellTotalMonto.innerText = formatMoney(neto);
+            }
+
+            // Martillo hidráulico - mostrar/ocultar filas y actualizar valores
+            document.getElementById('lbl-martillo-costo').innerText = formatMoney(tarifaMartillo);
+            document.getElementById('fila-martillo').style.display = incluyeMartillo ? '' : 'none';
+            document.getElementById('fila-martillo-resumen').style.display = incluyeMartillo ? '' : 'none';
+            if (incluyeMartillo) {
+                document.getElementById('out-tarifa-martillo').innerText = formatMoney(tarifaMartillo);
+                document.getElementById('out-dias-martillo').innerText = dias;
+                document.getElementById('out-subtotal-martillo').innerText = formatMoney(subtotalMartillo);
+                document.getElementById('out-subtotal-martillo-resumen').innerText = formatMoney(subtotalMartillo);
+            }
         }
         
         // Init fecha actual y cálculos iniciales
